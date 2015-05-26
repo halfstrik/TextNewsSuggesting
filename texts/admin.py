@@ -4,7 +4,7 @@ from texts.models import Text, Source
 
 
 class TextAdmin(admin.ModelAdmin):
-    list_display = ('title', 'body')
+    list_display = ('title', 'body', 'keywords')
 
 
 admin.site.register(Text, TextAdmin)
