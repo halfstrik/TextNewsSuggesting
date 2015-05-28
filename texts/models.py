@@ -19,5 +19,7 @@ class Text(models.Model):
 
     tags = TagField()
 
+    is_used_for_training = models.BooleanField(default=False)
+
     def __unicode__(self):
         return self.title
