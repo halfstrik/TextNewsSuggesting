@@ -1,5 +1,4 @@
 from django.db import models
-from tagging.fields import TagField
 from tagging.models import Tag
 
 
@@ -17,11 +16,10 @@ class Text(models.Model):
     description = models.TextField(blank=True, null=True)
     link = models.CharField(max_length=512, blank=True, null=True)
     published = models.DateTimeField(blank=True, null=True)
-    publisher_tags = models.CharField(max_length=255, blank=True, null=True)
 
     days_to_life = models.IntegerField(default=1)
     keywords = models.CharField(max_length=255, blank=True, null=True)
-    tags = TagField()
+    # tags = TagField()
 
     def __unicode__(self):
         return self.title

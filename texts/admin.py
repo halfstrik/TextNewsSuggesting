@@ -6,11 +6,11 @@ from texts.models import Text, Source, TagRelationship
 class TextAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('source', 'title', 'description', 'link', 'published', 'publisher_tags',)}),
+            'fields': ('source', 'title', 'description', 'link', 'published',)}),
         ('Manual options', {
-            'fields': ('days_to_life', 'keywords', 'tags')}))
+            'fields': ('days_to_life', 'keywords')}))
     list_display = ('source', 'title', 'published')
-    readonly_fields = ('source', 'title', 'description', 'link', 'published', 'publisher_tags')
+    readonly_fields = ('source', 'title', 'description', 'link', 'published')
     list_filter = ('source', 'published')
 
 

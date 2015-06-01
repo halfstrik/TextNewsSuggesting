@@ -5,6 +5,7 @@ from django.core.management import BaseCommand
 import feedparser
 import pytz
 from sklearn.feature_extraction.text import strip_tags
+from tagging.models import Tag
 
 from texts.models import Source, Text
 
@@ -27,13 +28,14 @@ class Command(BaseCommand):
                 if 'tags' in entry:
                     tags_list = []
                     for tag in entry.tags:
-                        tags_list.append(tag.term)
+                        tags_list.append('"' + source.name + ': ' + tag.term + '"')
                     publisher_tags = ', '.join(tags_list)
                 else:
                     publisher_tags = None
-                Text.objects.get_or_create(source=source,
-                                           title=title,
-                                           description=description,
-                                           link=link,
-                                           published=published,
-                                           publisher_tags=publisher_tags)
+                text, new = Text.objects.get_or_create(source=source,
+                                                       title=title,
+                                                       description=description,
+                                                       link=link,
+                                                       published=published)
+                if new:
+                    Tag.objects.update_tags(text, publisher_tags)
