@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from texts.models import Text, Source
+from texts.models import Text, Source, TagRelationship
 
 
 class TextAdmin(admin.ModelAdmin):
@@ -13,6 +13,7 @@ class TextAdmin(admin.ModelAdmin):
     readonly_fields = ('source', 'title', 'description', 'link', 'published', 'publisher_tags')
     list_filter = ('source', 'published')
 
+
 admin.site.register(Text, TextAdmin)
 
 
@@ -21,3 +22,10 @@ class SourceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Source, SourceAdmin)
+
+
+class TagRelationshipAdmin(admin.ModelAdmin):
+    list_display = ('first_tag', 'second_tag', 'weigh')
+
+
+admin.site.register(TagRelationship, TagRelationshipAdmin)

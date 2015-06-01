@@ -1,5 +1,6 @@
 from django.db import models
 from tagging.fields import TagField
+from tagging.models import Tag
 
 
 class Source(models.Model):
@@ -24,3 +25,9 @@ class Text(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class TagRelationship(models.Model):
+    first_tag = models.ForeignKey(Tag, related_name='tag_first')
+    second_tag = models.ForeignKey(Tag, related_name='tag_second')
+    weigh = models.PositiveSmallIntegerField()
