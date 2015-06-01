@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.core.management import BaseCommand
 import feedparser
+import pytz
 from sklearn.feature_extraction.text import strip_tags
 
 from texts.models import Source, Text
@@ -20,7 +21,7 @@ class Command(BaseCommand):
                     description = strip_tags(description)
                 link = entry.get('link', None)
                 if 'published_parsed' in entry:
-                    published = datetime.fromtimestamp(mktime(entry.published_parsed))
+                    published = datetime.fromtimestamp(mktime(entry.published_parsed)).replace(tzinfo=pytz.utc)
                 else:
                     published = None
                 if 'tags' in entry:
