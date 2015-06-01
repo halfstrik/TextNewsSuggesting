@@ -4,8 +4,20 @@ from texts.models import Text, Source
 
 
 class TextAdmin(admin.ModelAdmin):
-    list_display = ('title', 'body', 'tags', 'is_used_for_training')
-
+    fieldsets = (
+        (None, {
+            'fields': ('source', 'title', 'description', 'link', 'published', 'publisher_tags',)}),
+        ('Manual options', {
+            'fields': ('days_to_life', 'keywords', 'tags')}))
+    list_display = ('source', 'title', 'published')
+    readonly_fields = ('source', 'title', 'description', 'link', 'published', 'publisher_tags')
+    list_filter = ('source', 'published')
 
 admin.site.register(Text, TextAdmin)
-admin.site.register(Source)
+
+
+class SourceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'feed_link')
+
+
+admin.site.register(Source, SourceAdmin)

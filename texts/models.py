@@ -4,6 +4,7 @@ from tagging.fields import TagField
 
 class Source(models.Model):
     name = models.CharField(max_length=255)
+    feed_link = models.CharField(max_length=255)
 
     def __unicode__(self):
         return self.name
@@ -11,15 +12,15 @@ class Source(models.Model):
 
 class Text(models.Model):
     source = models.ForeignKey(Source)
-    date = models.DateTimeField()
+    title = models.CharField(max_length=1024, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    link = models.CharField(max_length=512, blank=True, null=True)
+    published = models.DateTimeField(blank=True, null=True)
+    publisher_tags = models.CharField(max_length=255, blank=True, null=True)
+
     days_to_life = models.IntegerField(default=1)
-    title = models.CharField(max_length=1024, unique=True)
-    body = models.TextField()
-    keywords = models.CharField(max_length=255)
-
+    keywords = models.CharField(max_length=255, blank=True, null=True)
     tags = TagField()
-
-    is_used_for_training = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.title
