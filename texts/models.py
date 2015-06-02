@@ -19,7 +19,6 @@ class Text(models.Model):
 
     days_to_life = models.IntegerField(default=1)
     keywords = models.CharField(max_length=255, blank=True, null=True)
-    # tags = TagField()
 
     def __unicode__(self):
         return self.title
@@ -28,4 +27,10 @@ class Text(models.Model):
 class TagRelationship(models.Model):
     first_tag = models.ForeignKey(Tag, related_name='tag_first')
     second_tag = models.ForeignKey(Tag, related_name='tag_second')
-    weigh = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = ('first_tag', 'second_tag')
+
+    RANKS = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),)
+
+    weigh = models.PositiveSmallIntegerField(choices=RANKS)

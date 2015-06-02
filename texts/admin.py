@@ -1,4 +1,5 @@
 from django.contrib import admin
+from tagging.models import Tag
 
 from texts.models import Text, Source, TagRelationship
 
@@ -29,3 +30,29 @@ class TagRelationshipAdmin(admin.ModelAdmin):
 
 
 admin.site.register(TagRelationship, TagRelationshipAdmin)
+
+
+class TagRelationshipInline(admin.TabularInline):
+    model = TagRelationship
+    fk_name = 'first_tag'
+    extra = 0
+
+
+class TagRelationshipInverseInline(admin.TabularInline):
+    model = TagRelationship
+    fk_name = 'second_tag'
+    extra = 0
+    verbose_name_plural = 'Inverse relationships to this tag'
+
+
+admin.site.unregister(Tag)
+
+
+class TagAdmin(admin.ModelAdmin):
+    inlines = [
+        TagRelationshipInline,
+        TagRelationshipInverseInline
+    ]
+
+
+admin.site.register(Tag, TagAdmin)
