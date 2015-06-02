@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="./sigma.js-release-v1.0.3/sigma.min.js"></script>
+<script src="./sigma.js-release-v1.0.3/plugins/sigma.layout.forceAtlas2.min.js"></script>
+<script src="./sigma.js-release-v1.0.3/plugins/sigma.parsers.json.min.js"></script>
+
+<div id="container">
+    <style>
+        #graph-container {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        position: absolute;
+        }
+    </style>
+    <div id="graph-container"></div>
+</div>
+<script>
+    var s = new sigma({
+        //container: 'graph-container',
+        renderer: {
+            container: document.getElementById('graph-container'),
+            type: 'canvas'
+        },
+        settings: {
+            edgeLabelSize: 'proportional',
+            zoomMin: 0.04
+        }
+    });
+    sigma.parsers.json(
+        '/texts/tags_relationships_json',
+        s,
+        function() {
+            var i,
+                nodes = s.graph.nodes(),
+                len = nodes.length;
+
+            for (i = 0; i < len; i++) {
+                nodes[i].x = Math.random();
+                nodes[i].y = Math.random();
+                nodes[i].color = nodes[i].center ? '#333' : '#666';
+            }
+
+            s.refresh();
+            s.startForceAtlas2();
+            setTimeout(function(){
+                s.stopForceAtlas2();
+            }, 3000);
+        }
+    );
+
+</script>
+
+</body>
+</html>
