@@ -37,6 +37,10 @@ class Text(models.Model):
     property_first = models.ForeignKey(PropertyFirst, blank=True, null=True)
     property_second = models.ForeignKey(PropertySecond, blank=True, null=True)
 
+    is_moderated = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
     def __unicode__(self):
         return self.title
 

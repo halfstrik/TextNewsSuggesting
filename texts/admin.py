@@ -1,5 +1,4 @@
 from django import forms
-
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from tagging.models import Tag, TaggedItem
@@ -31,12 +30,12 @@ class TaggedItemInline(GenericTabularInline):
 class TextAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('source', 'title', 'description', 'link', 'published',)}),
+            'fields': ('source', 'title', 'description', 'link', 'published', 'created', 'updated',)}),
         ('Manual options', {
-            'fields': ('days_to_life', 'keywords', 'property_first', 'property_second')}))
-    list_display = ('source', 'title', 'published')
-    readonly_fields = ('source', 'title', 'link', 'published')
-    list_filter = ('source', 'published')
+            'fields': ('days_to_life', 'keywords', 'property_first', 'property_second', 'is_moderated')}))
+    list_display = ('source', 'title', 'published', 'is_moderated')
+    readonly_fields = ('source', 'title', 'link', 'published', 'created', 'updated',)
+    list_filter = ('is_moderated', 'published', 'source',)
     search_fields = ['title', 'description']
     inlines = [TaggedItemInline, ]
 
