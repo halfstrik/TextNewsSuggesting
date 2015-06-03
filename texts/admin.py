@@ -1,7 +1,13 @@
 from django.contrib import admin
-from tagging.models import Tag
+from django.contrib.contenttypes.admin import GenericTabularInline
+from tagging.models import Tag, TaggedItem
 
 from texts.models import Text, Source, TagRelationship
+
+
+class TaggedItemInline(GenericTabularInline):
+    model = TaggedItem
+    extra = 0
 
 
 class TextAdmin(admin.ModelAdmin):
@@ -13,6 +19,7 @@ class TextAdmin(admin.ModelAdmin):
     list_display = ('source', 'title', 'published')
     readonly_fields = ('source', 'title', 'description', 'link', 'published')
     list_filter = ('source', 'published')
+    inlines = [TaggedItemInline, ]
 
 
 admin.site.register(Text, TextAdmin)
