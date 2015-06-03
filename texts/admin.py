@@ -19,6 +19,7 @@ class TextAdmin(admin.ModelAdmin):
     list_display = ('source', 'title', 'published')
     readonly_fields = ('source', 'title', 'description', 'link', 'published')
     list_filter = ('source', 'published')
+    search_fields = ['title', 'description']
     inlines = [TaggedItemInline, ]
 
 
@@ -34,6 +35,8 @@ admin.site.register(Source, SourceAdmin)
 
 class TagRelationshipAdmin(admin.ModelAdmin):
     list_display = ('first_tag', 'second_tag', 'weigh')
+    search_fields = ['first_tag__name', 'second_tag__name']
+    list_filter = ('weigh',)
 
 
 admin.site.register(TagRelationship, TagRelationshipAdmin)
@@ -56,6 +59,7 @@ admin.site.unregister(Tag)
 
 
 class TagAdmin(admin.ModelAdmin):
+    search_fields = ['name']
     inlines = [
         TagRelationshipInline,
         TagRelationshipInverseInline
