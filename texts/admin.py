@@ -5,7 +5,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from tagging.models import Tag, TaggedItem
 from django.utils.translation import ugettext_lazy as _
 
-from texts.models import Text, Source, TagRelationship
+from texts.models import Text, Source, TagRelationship, PropertyFirst, PropertySecond
 
 
 class TaggedItemModelForm(forms.ModelForm):
@@ -33,7 +33,7 @@ class TextAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('source', 'title', 'description', 'link', 'published',)}),
         ('Manual options', {
-            'fields': ('days_to_life', 'keywords')}))
+            'fields': ('days_to_life', 'keywords', 'property_first', 'property_second')}))
     list_display = ('source', 'title', 'published')
     readonly_fields = ('source', 'title', 'link', 'published')
     list_filter = ('source', 'published')
@@ -105,3 +105,6 @@ class TagAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Tag, TagAdmin)
+
+admin.site.register(PropertyFirst)
+admin.site.register(PropertySecond)

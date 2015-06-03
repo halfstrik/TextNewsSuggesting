@@ -10,6 +10,20 @@ class Source(models.Model):
         return self.name
 
 
+class PropertyFirst(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
+
+class PropertySecond(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
+
 class Text(models.Model):
     source = models.ForeignKey(Source)
     title = models.CharField(max_length=1024, blank=True, null=True)
@@ -19,6 +33,9 @@ class Text(models.Model):
 
     days_to_life = models.IntegerField(default=1)
     keywords = models.CharField(max_length=255, blank=True, null=True)
+
+    property_first = models.ForeignKey(PropertyFirst, blank=True, null=True)
+    property_second = models.ForeignKey(PropertySecond, blank=True, null=True)
 
     def __unicode__(self):
         return self.title
