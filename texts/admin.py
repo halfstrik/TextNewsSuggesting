@@ -4,7 +4,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from tagging.models import Tag, TaggedItem
 from django.utils.translation import ugettext_lazy as _
 
-from texts.models import Text, Source, TagRelationship, PropertyFirst, PropertySecond
+from texts.models import Text, Source, TagRelationship, PropertyFirst, PropertySecond, Comment
 
 
 class TaggedItemModelForm(forms.ModelForm):
@@ -27,17 +27,40 @@ class TaggedItemInline(GenericTabularInline):
     form = TaggedItemModelForm
 
 
+class CommentInlineFormset(forms.models.BaseInlineFormSet):
+    def save_new(self, form, commit=True):
+        obj = super(CommentInlineFormset, self).save_new(form, commit=False)
+        obj.user = self.request.user
+
+        if commit:
+            obj.save()
+
+        return obj
+
+
+class CommentInline(admin.TabularInline):
+    model = Comment
+    extra = 0
+    readonly_fields = ['user', 'created', 'updated']
+    formset = CommentInlineFormset
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super(CommentInline, self).get_formset(request, obj, **kwargs)
+        formset.request = request
+        return formset
+
+
 class TextAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('source', 'title', 'description', 'link', 'published', 'created', 'updated',)}),
         ('Manual options', {
             'fields': ('days_to_life', 'keywords', 'property_first', 'property_second', 'is_moderated')}))
-    list_display = ('source', 'title', 'published', 'is_moderated')
+    list_display = ('source', 'title', 'published', 'is_moderated', 'comments_count')
     readonly_fields = ('source', 'title', 'link', 'published', 'created', 'updated',)
     list_filter = ('is_moderated', 'published', 'source',)
     search_fields = ['title', 'description']
-    inlines = [TaggedItemInline, ]
+    inlines = [TaggedItemInline, CommentInline]
 
 
 admin.site.register(Text, TextAdmin)
@@ -107,3 +130,11 @@ admin.site.register(Tag, TagAdmin)
 
 admin.site.register(PropertyFirst)
 admin.site.register(PropertySecond)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'news', 'updated', 'text')
+    readonly_fields = ['user', 'created', 'updated', 'news']
+
+
+admin.site.register(Comment, CommentAdmin)

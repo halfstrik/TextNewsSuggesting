@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from tagging.models import Tag
 
@@ -44,6 +45,9 @@ class Text(models.Model):
     def __unicode__(self):
         return self.title
 
+    def comments_count(self):
+        return Comment.objects.filter(news=self.id).count()
+
 
 class TagRelationship(models.Model):
     first_tag = models.ForeignKey(Tag, related_name='tag_first')
@@ -56,3 +60,13 @@ class TagRelationship(models.Model):
 
     weigh = models.PositiveSmallIntegerField(choices=RANKS)
 
+
+class Comment(models.Model):
+    text = models.TextField()
+    user = models.ForeignKey(User, editable=False)
+    news = models.ForeignKey(Text, editable=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.text
