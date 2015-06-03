@@ -1,13 +1,31 @@
+from django import forms
+
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 from tagging.models import Tag, TaggedItem
+from django.utils.translation import ugettext_lazy as _
 
 from texts.models import Text, Source, TagRelationship
+
+
+class TaggedItemModelForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(TaggedItemModelForm, self).__init__(*args, **kwargs)
+        ids = list(Tag.objects.exclude(name__contains=':').values_list('id', flat=True))
+        if 'instance' in kwargs:
+            ids += list(Tag.objects.filter(name__startswith=kwargs['instance'].object.source.name)
+                        .values_list('id', flat=True))
+        self.fields['tag'].queryset = Tag.objects.filter(id__in=ids)
 
 
 class TaggedItemInline(GenericTabularInline):
     model = TaggedItem
     extra = 0
+    form = TaggedItemModelForm
 
 
 class TextAdmin(admin.ModelAdmin):
@@ -17,7 +35,7 @@ class TextAdmin(admin.ModelAdmin):
         ('Manual options', {
             'fields': ('days_to_life', 'keywords')}))
     list_display = ('source', 'title', 'published')
-    readonly_fields = ('source', 'title', 'description', 'link', 'published')
+    readonly_fields = ('source', 'title', 'link', 'published')
     list_filter = ('source', 'published')
     search_fields = ['title', 'description']
     inlines = [TaggedItemInline, ]
@@ -27,6 +45,7 @@ admin.site.register(Text, TextAdmin)
 
 
 class SourceAdmin(admin.ModelAdmin):
+    readonly_fields = ('name',)
     list_display = ('name', 'feed_link')
 
 
@@ -55,11 +74,30 @@ class TagRelationshipInverseInline(admin.TabularInline):
     verbose_name_plural = 'Inverse relationships to this tag'
 
 
+admin.site.unregister(TaggedItem)
 admin.site.unregister(Tag)
+
+
+class CreatorTagFilter(admin.SimpleListFilter):
+    title = _('is creator specific')
+    parameter_name = 'creator'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('creator', _('creator\'s')),
+            ('general', _('general')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'creator':
+            return queryset.filter(name__contains=':')
+        if self.value() == 'general':
+            return queryset.exclude(name__contains=':')
 
 
 class TagAdmin(admin.ModelAdmin):
     search_fields = ['name']
+    list_filter = (CreatorTagFilter,)
     inlines = [
         TagRelationshipInline,
         TagRelationshipInverseInline
