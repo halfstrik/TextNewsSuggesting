@@ -7,7 +7,13 @@ import pytz
 from sklearn.feature_extraction.text import strip_tags
 from tagging.models import Tag
 
+from TextNewsSuggesting import settings
+
 from texts.models import Source, Text
+
+
+def limit_string_length(s, l):
+    return s if len(s) <= l else s[:l]
 
 
 class Command(BaseCommand):
@@ -30,7 +36,9 @@ class Command(BaseCommand):
                 if 'tags' in entry:
                     tags_list = []
                     for tag in entry.tags:
-                        tags_list.append('"' + source.name + ': ' + tag.term + '"')
+                        tag_name = source.name + ': ' + tag.term
+                        tag_name = limit_string_length(tag_name, settings.MAX_TAG_LENGTH)
+                        tags_list.append('"' + tag_name + '"')
                     publisher_tags = ', '.join(tags_list)
                 else:
                     publisher_tags = None
