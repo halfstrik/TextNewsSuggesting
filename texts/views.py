@@ -9,10 +9,11 @@ from texts.models import Text, TagRelationship
 def tags_relationships_json(request):
     tags = Tag.objects.usage_for_model(Text, counts=True)
     nodes = []
+    tag_ids = []
     for name, count, tag_id in [(tag.name, tag.count, tag.id) for tag in tags]:
         nodes.append({'label': name, 'size': str(count), 'id': str(tag_id)})
-
-    relationships = TagRelationship.objects.all()
+        tag_ids.append(tag_id)
+    relationships = TagRelationship.objects.filter(first_tag__in=tag_ids).filter(second_tag__in=tag_ids)
     edges = []
     for relationship in relationships:
         edges.append({'source': str(relationship.first_tag.id),
