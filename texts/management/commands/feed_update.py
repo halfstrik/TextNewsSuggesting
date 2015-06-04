@@ -37,6 +37,7 @@ class Command(BaseCommand):
                     tags_list = []
                     for tag in entry.tags:
                         tag_name = source.name + ': ' + tag.term
+                        tag_name = tag_name.replace('"', '')
                         tag_name = limit_string_length(tag_name, settings.MAX_TAG_LENGTH)
                         tags_list.append('"' + tag_name + '"')
                     publisher_tags = ', '.join(tags_list)
