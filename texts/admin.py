@@ -67,7 +67,6 @@ admin.site.register(Text, TextAdmin)
 
 
 class SourceAdmin(admin.ModelAdmin):
-    readonly_fields = ('name',)
     list_display = ('name', 'feed_link')
 
 
