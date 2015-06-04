@@ -29,6 +29,7 @@ class Text(models.Model):
     source = models.ForeignKey(Source)
     title = models.CharField(max_length=1024, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    body = models.TextField(blank=True, null=True)
     link = models.CharField(max_length=512, blank=True, null=True)
     published = models.DateTimeField(blank=True, null=True)
 

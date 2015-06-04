@@ -53,11 +53,11 @@ class CommentInline(admin.TabularInline):
 class TextAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('source', 'title', 'description', 'link', 'published', 'created', 'updated',)}),
+            'fields': ('source', 'title', 'description', 'body', 'link', 'published', 'created', 'updated',)}),
         ('Manual options', {
             'fields': ('days_to_life', 'keywords', 'property_first', 'property_second', 'is_moderated')}))
     list_display = ('source', 'title', 'published', 'is_moderated', 'comments_count')
-    readonly_fields = ('source', 'title', 'link', 'published', 'created', 'updated',)
+    readonly_fields = ('source', 'title', 'description', 'link', 'published', 'created', 'updated',)
     list_filter = ('is_moderated', 'published', 'source',)
     search_fields = ['title', 'description']
     inlines = [TaggedItemInline, CommentInline]
