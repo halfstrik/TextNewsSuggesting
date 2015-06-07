@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tagging',
+    'taggit',
     'texts',
 )
 
@@ -110,4 +110,4 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-MAX_TAG_LENGTH = 255
+MAX_TAG_LENGTH = 100

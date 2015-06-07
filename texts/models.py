@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
-from tagging.models import Tag
+from taggit.models import TagBase, ItemBase, GenericTaggedItemBase
+from django.utils.translation import ugettext_lazy as _
 
 
 class Source(models.Model):
@@ -50,16 +51,64 @@ class Text(models.Model):
         return Comment.objects.filter(news=self.id).count()
 
 
-class TagRelationship(models.Model):
-    first_tag = models.ForeignKey(Tag, related_name='tag_first')
-    second_tag = models.ForeignKey(Tag, related_name='tag_second')
+class SourceTag(TagBase):
+    source = models.ForeignKey(Source)
+
+    class Meta:
+        verbose_name = _("Source tag")
+        verbose_name_plural = _("Source tags")
+
+
+class SourceTaggedItemBase(ItemBase):
+    tag = models.ForeignKey(SourceTag, related_name="%(app_label)s_%(class)s_items")
+
+    class Meta:
+        abstract = True
+
+
+class SourceTaggedItem(GenericTaggedItemBase, SourceTaggedItemBase):
+    class Meta:
+        verbose_name = _("Source Tagged Item")
+        verbose_name_plural = _("Source Tagged Items")
+
+
+class CommonTag(TagBase):
+    associations = models.CharField(max_length=1024)
+
+    class Meta:
+        verbose_name = _("Common tag")
+        verbose_name_plural = _("Common tags")
+
+
+WEAK = 'WK'
+AVERAGE = 'AV'
+STRONG = 'ST'
+STRENGTH = ((WEAK, 'Weak'), (AVERAGE, 'Average'), (STRONG, 'Strong'))
+
+
+class CommonTagRelationship(models.Model):
+    first_tag = models.ForeignKey(CommonTag, related_name='first_tag')
+    second_tag = models.ForeignKey(CommonTag, related_name='second_tag')
+
+    weigh = models.CharField(max_length=2, choices=STRENGTH, default=AVERAGE)
 
     class Meta:
         unique_together = ('first_tag', 'second_tag')
 
-    RANKS = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),)
 
-    weigh = models.PositiveSmallIntegerField(choices=RANKS)
+class CommonTaggedItemBase(ItemBase):
+    tag = models.ForeignKey(CommonTag, related_name="%(app_label)s_%(class)s_items")
+
+    class Meta:
+        abstract = True
+
+
+class CommonTaggedItem(GenericTaggedItemBase, CommonTaggedItemBase):
+    weigh = models.CharField(max_length=2, choices=STRENGTH, default=AVERAGE)
+
+    class Meta:
+        verbose_name = _("Common Tagged Item")
+        verbose_name_plural = _("Common Tagged Items")
 
 
 class Comment(models.Model):

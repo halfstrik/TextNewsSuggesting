@@ -4,12 +4,11 @@ from datetime import datetime
 from django.core.management import BaseCommand
 import feedparser
 import pytz
+
 from sklearn.feature_extraction.text import strip_tags
-from tagging.models import Tag
 
 from TextNewsSuggesting import settings
-
-from texts.models import Source, Text
+from texts.models import Source, Text, SourceTag, SourceTaggedItem
 
 
 def limit_string_length(s, l):
@@ -33,16 +32,13 @@ class Command(BaseCommand):
                     published = datetime.fromtimestamp(mktime(entry.published_parsed)).replace(tzinfo=pytz.utc)
                 else:
                     published = None
+                tags_list = []
                 if 'tags' in entry:
-                    tags_list = []
                     for tag in entry.tags:
                         tag_name = source.name + ': ' + tag.term
                         tag_name = tag_name.replace('"', '')
                         tag_name = limit_string_length(tag_name, settings.MAX_TAG_LENGTH)
-                        tags_list.append('"' + tag_name + '"')
-                    publisher_tags = ', '.join(tags_list)
-                else:
-                    publisher_tags = None
+                        tags_list.append(tag_name)
                 try:
                     text, new = Text.objects.get_or_create(source=source,
                                                            title=title,
@@ -51,6 +47,11 @@ class Command(BaseCommand):
                     if new:
                         text.description = description
                         text.save()
-                        Tag.objects.update_tags(text, publisher_tags)
+                        for tag_name in tags_list:
+                            source_tag, new = SourceTag.objects.get_or_create(name=tag_name,
+                                                                              slug=tag_name,
+                                                                              source=source)
+                            SourceTaggedItem.objects.create(content_object=text, tag=source_tag)
+
                 except Text.MultipleObjectsReturned:
                     pass

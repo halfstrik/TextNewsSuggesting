@@ -1,30 +1,30 @@
 from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
-from tagging.models import Tag, TaggedItem
-from django.utils.translation import ugettext_lazy as _
+from taggit.models import Tag
 
-from texts.models import Text, Source, TagRelationship, PropertyFirst, PropertySecond, Comment
-
-
-class TaggedItemModelForm(forms.ModelForm):
-    class Meta:
-        model = Tag
-        fields = '__all__'
-
-    def __init__(self, *args, **kwargs):
-        super(TaggedItemModelForm, self).__init__(*args, **kwargs)
-        ids = list(Tag.objects.exclude(name__contains=':').values_list('id', flat=True))
-        if 'instance' in kwargs:
-            ids += list(Tag.objects.filter(name__startswith=kwargs['instance'].object.source.name)
-                        .values_list('id', flat=True))
-        self.fields['tag'].queryset = Tag.objects.filter(id__in=ids)
+from texts.models import Text, Source, PropertyFirst, PropertySecond, Comment, CommonTaggedItem, CommonTagRelationship, \
+    CommonTag, SourceTaggedItem
 
 
-class TaggedItemInline(GenericTabularInline):
-    model = TaggedItem
+class SourceTaggedItemInline(GenericTabularInline):
+    model = SourceTaggedItem
     extra = 0
-    form = TaggedItemModelForm
+
+    readonly_fields = ('tag',)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class CommonTaggedItemInline(GenericTabularInline):
+    model = CommonTaggedItem
+    extra = 0
+
+    raw_id_fields = ('tag',)
 
 
 class CommentInlineFormset(forms.models.BaseInlineFormSet):
@@ -60,7 +60,7 @@ class TextAdmin(admin.ModelAdmin):
     readonly_fields = ('source', 'title', 'description', 'link', 'published', 'created', 'updated',)
     list_filter = ('is_moderated', 'published', 'source',)
     search_fields = ['title', 'description']
-    inlines = [TaggedItemInline, CommentInline]
+    inlines = [SourceTaggedItemInline, CommonTaggedItemInline, CommentInline]
 
 
 admin.site.register(Text, TextAdmin)
@@ -73,59 +73,44 @@ class SourceAdmin(admin.ModelAdmin):
 admin.site.register(Source, SourceAdmin)
 
 
-class TagRelationshipAdmin(admin.ModelAdmin):
+class CommonTagRelationshipAdmin(admin.ModelAdmin):
     list_display = ('first_tag', 'second_tag', 'weigh')
     search_fields = ['first_tag__name', 'second_tag__name']
     list_filter = ('weigh',)
+    raw_id_fields = ('first_tag', 'second_tag',)
 
 
-admin.site.register(TagRelationship, TagRelationshipAdmin)
+admin.site.register(CommonTagRelationship, CommonTagRelationshipAdmin)
 
 
-class TagRelationshipInline(admin.TabularInline):
-    model = TagRelationship
+class CommonTagRelationshipInline(admin.TabularInline):
+    model = CommonTagRelationship
     fk_name = 'first_tag'
     extra = 0
+    raw_id_fields = ('second_tag',)
 
 
-class TagRelationshipInverseInline(admin.TabularInline):
-    model = TagRelationship
+class CommonTagRelationshipInverseInline(admin.TabularInline):
+    model = CommonTagRelationship
     fk_name = 'second_tag'
     extra = 0
     verbose_name_plural = 'Inverse relationships to this tag'
+    raw_id_fields = ('first_tag',)
 
 
-admin.site.unregister(TaggedItem)
 admin.site.unregister(Tag)
 
 
-class CreatorTagFilter(admin.SimpleListFilter):
-    title = _('is creator specific')
-    parameter_name = 'creator'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('creator', _('creator\'s')),
-            ('general', _('general')),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'creator':
-            return queryset.filter(name__contains=':')
-        if self.value() == 'general':
-            return queryset.exclude(name__contains=':')
-
-
-class TagAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-    list_filter = (CreatorTagFilter,)
+class CommonTagAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'associations']
+    list_display = ['name', 'associations']
     inlines = [
-        TagRelationshipInline,
-        TagRelationshipInverseInline
+        CommonTagRelationshipInline,
+        CommonTagRelationshipInverseInline
     ]
 
 
-admin.site.register(Tag, TagAdmin)
+admin.site.register(CommonTag, CommonTagAdmin)
 
 admin.site.register(PropertyFirst)
 admin.site.register(PropertySecond)
