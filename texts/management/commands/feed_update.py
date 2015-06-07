@@ -21,25 +21,25 @@ class Command(BaseCommand):
         for source in sources:
             d = feedparser.parse(source.feed_link)
             for entry in d.entries:
-                description = entry.get('description', None)
-                if description:
-                    description = strip_tags(description)
-                title = entry.get('title', description)
-                if not title:
-                    continue
-                link = entry.get('link', None)
-                if 'published_parsed' in entry:
-                    published = datetime.fromtimestamp(mktime(entry.published_parsed)).replace(tzinfo=pytz.utc)
-                else:
-                    published = None
-                tags_list = []
-                if 'tags' in entry:
-                    for tag in entry.tags:
-                        tag_name = source.name + ': ' + tag.term
-                        tag_name = tag_name.replace('"', '')
-                        tag_name = limit_string_length(tag_name, settings.MAX_TAG_LENGTH)
-                        tags_list.append(tag_name)
                 try:
+                    description = entry.get('description', None)
+                    if description:
+                        description = strip_tags(description)
+                    title = entry.get('title', description)
+                    if not title:
+                        continue
+                    link = entry.get('link', None)
+                    if 'published_parsed' in entry:
+                        published = datetime.fromtimestamp(mktime(entry.published_parsed)).replace(tzinfo=pytz.utc)
+                    else:
+                        published = None
+                    tags_list = []
+                    if 'tags' in entry:
+                        for tag in entry.tags:
+                            tag_name = source.name + ': ' + tag.term
+                            tag_name = tag_name.replace('"', '')
+                            tag_name = limit_string_length(tag_name, settings.MAX_TAG_LENGTH)
+                            tags_list.append(tag_name)
                     text, new = Text.objects.get_or_create(source=source,
                                                            title=title,
                                                            published=published,
@@ -55,3 +55,5 @@ class Command(BaseCommand):
 
                 except Text.MultipleObjectsReturned:
                     pass
+                except:
+                    print 'Some error, skip entry of ' + str(source)
