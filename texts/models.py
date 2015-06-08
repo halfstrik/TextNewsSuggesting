@@ -120,3 +120,14 @@ class Comment(models.Model):
 
     def __unicode__(self):
         return self.text
+
+
+class KeyNormalizedWords(models.Model):
+    words = models.CharField(max_length=255)
+    tag = models.ForeignKey(CommonTag)
+
+    class Meta:
+        unique_together = ('words', 'tag')
+
+    def __unicode__(self):
+        return self.words

@@ -4,7 +4,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from taggit.models import Tag
 
 from texts.models import Text, Source, PropertyFirst, PropertySecond, Comment, CommonTaggedItem, CommonTagRelationship, \
-    CommonTag, SourceTaggedItem
+    CommonTag, SourceTaggedItem, KeyNormalizedWords
 
 
 class SourceTaggedItemInline(GenericTabularInline):
@@ -83,6 +83,10 @@ class CommonTagRelationshipAdmin(admin.ModelAdmin):
 admin.site.register(CommonTagRelationship, CommonTagRelationshipAdmin)
 
 
+class CommonTagKeyNormalizedWordsInline(admin.TabularInline):
+    model = KeyNormalizedWords
+    extra = 0
+
 class CommonTagRelationshipInline(admin.TabularInline):
     model = CommonTagRelationship
     fk_name = 'first_tag'
@@ -105,6 +109,7 @@ class CommonTagAdmin(admin.ModelAdmin):
     search_fields = ['name', 'associations']
     list_display = ['name', 'associations']
     inlines = [
+        CommonTagKeyNormalizedWordsInline,
         CommonTagRelationshipInline,
         CommonTagRelationshipInverseInline
     ]
