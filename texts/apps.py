@@ -5,4 +5,5 @@ class TextsConfig(AppConfig):
     name = 'texts'
 
     def ready(self):
-        pass
+        # noinspection PyUnresolvedReferences
+        import signals
