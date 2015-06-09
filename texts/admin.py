@@ -55,9 +55,11 @@ class TextAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('source', 'title', 'description', 'body', 'original_link', 'published', 'created', 'updated',)}),
         ('Manual options', {
-            'fields': ('days_to_life', 'keywords', 'property_first', 'property_second', 'is_moderated')}))
+            'fields': ('days_to_life', 'keywords', 'property_first', 'property_second', 'is_moderated',
+                       'auto_assign_tags_link')}))
     list_display = ('source', 'title', 'published', 'is_moderated', 'comments_count')
-    readonly_fields = ('source', 'title', 'description', 'original_link', 'published', 'created', 'updated',)
+    readonly_fields = ('source', 'title', 'description', 'original_link', 'published', 'created', 'updated',
+                       'auto_assign_tags_link')
     list_filter = ('is_moderated', 'published', 'source',)
     search_fields = ['title', 'description']
     inlines = [SourceTaggedItemInline, CommonTaggedItemInline, CommentInline]

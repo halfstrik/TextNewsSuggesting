@@ -1,6 +1,8 @@
 import json
 
-from django.http import HttpResponse
+from django.core import management
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from texts.models import CommonTag, CommonTaggedItem, CommonTagRelationship, WEAK, AVERAGE
 
@@ -24,3 +26,8 @@ def general_tags_relationships_json(request):
                       'type': 'curve'})
 
     return HttpResponse(json.dumps({'edges': edges, 'nodes': nodes}))
+
+
+def assign_common_tags_to_text(request, text_id):
+    management.call_command('update_common_tags_on_text_by_id', text_id)
+    return HttpResponseRedirect(reverse('admin:texts_text_change', args=(text_id,)))

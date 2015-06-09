@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.db import models
 from taggit.models import TagBase, ItemBase, GenericTaggedItemBase
 from django.utils.translation import ugettext_lazy as _
@@ -51,9 +52,15 @@ class Text(models.Model):
         return Comment.objects.filter(news=self.id).count()
 
     def original_link(self):
-        return '<a href=%s>link</a>' % self.link
+        return '<a href="%s">click me with MIDDLE mouse</a>' % self.link
 
     original_link.allow_tags = True
+
+    def auto_assign_tags_link(self):
+        return '<a href="%s">click me with LEFT mouse</a>' % reverse('assign_common_tags_to_text', args=[self.id])
+
+    auto_assign_tags_link.allow_tags = True
+
 
 class SourceTag(TagBase):
     source = models.ForeignKey(Source)
