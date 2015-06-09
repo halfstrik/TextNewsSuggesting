@@ -128,4 +128,11 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(KeyNormalizedWords)
+
+
+class KeyNormalizedWordsAdmin(admin.ModelAdmin):
+    list_display = ('words', 'tag',)
+    search_fields = ('words', 'tag__name',)
+
+
+admin.site.register(KeyNormalizedWords, KeyNormalizedWordsAdmin)

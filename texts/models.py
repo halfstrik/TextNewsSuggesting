@@ -132,6 +132,7 @@ class KeyNormalizedWords(models.Model):
 
     class Meta:
         unique_together = ('words', 'tag')
+        verbose_name_plural = _("Key normalized words")
 
     def __unicode__(self):
         return self.words
