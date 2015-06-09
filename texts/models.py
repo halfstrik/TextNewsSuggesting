@@ -50,6 +50,10 @@ class Text(models.Model):
     def comments_count(self):
         return Comment.objects.filter(news=self.id).count()
 
+    def original_link(self):
+        return '<a href=%s>link</a>' % self.link
+
+    original_link.allow_tags = True
 
 class SourceTag(TagBase):
     source = models.ForeignKey(Source)
