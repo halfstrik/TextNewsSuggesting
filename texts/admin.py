@@ -127,6 +127,8 @@ admin.site.register(PropertySecond)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'news', 'updated', 'text')
     readonly_fields = ['user', 'created', 'updated', 'news']
+    search_fields = ['news__title', 'text']
+    list_filter = ['user']
 
 
 admin.site.register(Comment, CommentAdmin)
