@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.admin import GenericTabularInline
+from django.db.models import F
 from taggit.models import Tag
 
 from texts.models import Text, Source, PropertyFirst, PropertySecond, Comment, CommonTaggedItem, CommonTagRelationship, \
@@ -50,6 +54,23 @@ class CommentInline(admin.TabularInline):
         return formset
 
 
+class UpdatedTextsFilter(SimpleListFilter):
+    title = 'Updated texts'
+    parameter_name = 'updated'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('updated', 'was updated after creation'),
+            ('not_modified', 'not touched after creation'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'updated':
+            return queryset.filter(updated__gt=F('created') + timedelta(seconds=1))
+        if self.value() == 'not_modified':
+            return queryset.exclude(updated__gt=F('created') + timedelta(seconds=1))
+
+
 class TextAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
@@ -60,7 +81,7 @@ class TextAdmin(admin.ModelAdmin):
     list_display = ('source', 'title', 'published', 'is_moderated', 'comments_count')
     readonly_fields = ('source', 'title', 'description', 'original_link', 'published', 'created', 'updated',
                        'auto_assign_tags_link')
-    list_filter = ('is_moderated', 'published', 'source',)
+    list_filter = ('is_moderated', 'published', UpdatedTextsFilter, 'source',)
     search_fields = ['title', 'description']
     inlines = [SourceTaggedItemInline, CommonTaggedItemInline, CommentInline]
 
