@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils.text import slugify
 from taggit.models import TagBase, ItemBase, GenericTaggedItemBase
 from django.utils.translation import ugettext_lazy as _
+from unidecode import unidecode
 
 
 class Source(models.Model):
@@ -85,6 +87,11 @@ class SourceTaggedItem(GenericTaggedItemBase, SourceTaggedItemBase):
 
 class CommonTag(TagBase):
     associations = models.CharField(max_length=1024)
+
+    def save(self):
+        if not self.pk:
+            self.slug = slugify(unidecode(self.name))
+        super(CommonTag, self).save()
 
     class Meta:
         verbose_name = _("Common tag")

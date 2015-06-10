@@ -109,6 +109,7 @@ admin.site.unregister(Tag)
 
 
 class CommonTagAdmin(admin.ModelAdmin):
+    exclude = ('slug',)
     search_fields = ['name', 'associations']
     list_display = ['name', 'associations']
     inlines = [
