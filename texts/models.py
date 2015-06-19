@@ -38,7 +38,7 @@ class Text(models.Model):
     published = models.DateTimeField(blank=True, null=True)
 
     days_to_life = models.IntegerField(default=1)
-    keywords = models.CharField(max_length=255, blank=True, null=True)
+    keywords = models.CharField(max_length=1024, blank=True, null=True)
 
     property_first = models.ForeignKey(PropertyFirst, blank=True, null=True)
     property_second = models.ForeignKey(PropertySecond, blank=True, null=True)
