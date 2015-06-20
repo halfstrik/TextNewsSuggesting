@@ -11,4 +11,4 @@ class Command(BaseCommand):
             print str(datetime.now()) + ' Run texts_tf_idf_fill_key_words...'
             management.call_command('texts_tf_idf_fill_key_words')
             print str(datetime.now()) + ' Finish texts_tf_idf_fill_key_words...'
-            sleep(5)
+            sleep(600)
