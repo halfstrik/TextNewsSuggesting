@@ -19,7 +19,12 @@ class Command(BaseCommand):
         vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, max_features=n_features,
                                      stop_words=stop_words)
 
-        texts = Text.objects.filter(is_moderated=False, keywords__isnull=True).order_by('-published')[0:n_samples]
+        texts = Text.objects.filter(is_moderated=False, keywords__isnull=True).order_by('-published')
+        print str(len(texts)) + ' frame ' + str(n_samples)
+        texts = texts[0:n_samples]
+        if len(texts) < n_samples:
+            print 'Not enough news, wait while will be more available'
+            return
         normalized_texts = []
         for text in texts:
             all_words = unicode(text.title) + ' ' + unicode(text.description) + ' ' + unicode(text.body)
@@ -43,5 +48,6 @@ class Command(BaseCommand):
                     break
                 key_words.append(word_local_max_rank)
                 del rank_per_word[word_local_max_rank]
-            text.keywords = ' '.join(key_words)
+            keywords = ' '.join(key_words)
+            text.keywords = keywords if len(keywords) < 1024 else key_words[0:1024]
             text.save()
